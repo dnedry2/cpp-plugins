@@ -1,12 +1,14 @@
+cc=g++
+
 .PHONY: build,plugin
 
 all: build plugin
 
 build:
-	clang++ -I ../ source.cpp ../plugin.cpp -o demo -arch arm64 -std=c++17
+	$(cc) -I ../ source.cpp ../plugin.cpp -o demo -std=c++17 -ldl
 	mv demo bin/
 
 plugin:
-	clang++ -shared -I ../ plugins/plugin.factorial.cpp -o factorial.so -arch arm64
-	clang++ -shared -I ../ plugins/plugin.fibonacci.cpp -o fibonacci.so -arch arm64
+	$(cc) -shared -fPIC -I ../ plugins/plugin.factorial.cpp -o factorial.so
+	$(cc) -shared -fPIC -I ../ plugins/plugin.fibonacci.cpp -o fibonacci.so
 	mv *.so bin/plugins/
