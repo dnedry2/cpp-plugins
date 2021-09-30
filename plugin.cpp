@@ -8,12 +8,12 @@
 
 using namespace std;
 
-#ifdef __linux
+#ifdef __unix
     #include <dlfcn.h>
 #endif
 
 void DestroyInterface(PluginInterface* interface) {
-#ifdef __linux
+#ifdef __unix
     dlclose(interface->_handle);
 #endif
 }
@@ -23,7 +23,7 @@ PluginInterface LoadPlugin(std::string path) {
     typedef PluginInterface (*Interface)();
     Interface plug = nullptr;
 
-#ifdef __linux
+#ifdef __unix
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
     if (!handle) {
