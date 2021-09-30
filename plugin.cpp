@@ -6,15 +6,21 @@
 #define PLUGIN_CLIENT
 #include "plugin.h"
 
-using namespace std;
+using std::cerr;
+using std::endl;
+using std::vector;
 
 #if defined __unix || defined __APPLE__
     #include <dlfcn.h>
+#elif defined _WIN32 || defined _WIN64
+    #include <Windows.h>
 #endif
 
-void DestroyInterface(PluginInterface* interface) {
+void DestroyInterface(PluginInterface* plugin) {
 #if defined __unix || defined __APPLE__
-    dlclose(interface->_handle);
+    dlclose(plugin->_handle);
+#elif defined _WIN32 || defined _WIN64
+    FreeLibrary((HMODULE)plugin->_handle);
 #endif
 }
 
@@ -40,6 +46,21 @@ PluginInterface LoadPlugin(std::string path) {
         cerr << "Cannot load symbols: " << dlsym_error << endl;
         throw("Failed to load!");
     }
+#elif defined _WIN32 || defined _WIN64
+    HMODULE handle = LoadLibraryA(path.c_str());
+    if (handle == NULL) {
+        cerr << "Cannot open library." << endl;
+        throw("Failed to load! (IO)");
+    }
+
+    FARPROC plugp = GetProcAddress(handle,"Interface");
+
+    if (plugp == NULL) {
+        cerr << "Cannot load symbols." << endl;
+        throw("Failed to load!");
+    }
+
+    plug = (Interface)plugp;
 #endif
 
     PluginInterface out = plug();
@@ -53,7 +74,7 @@ std::vector<PluginInterface> LoadPlugins(std::string dir) {
 
     for (const auto& file : std::filesystem::directory_iterator(dir)) {
         try {
-            out.push_back(LoadPlugin(file.path()));
+            out.push_back(LoadPlugin(file.path().string()));
         } catch (...) { }
     }
 

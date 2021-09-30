@@ -4,7 +4,10 @@
 #define PLUGIN_CLIENT
 #include "plugin.h"
 
-using namespace std;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::vector;
 
 vector<PluginInterface> plugins;
 
