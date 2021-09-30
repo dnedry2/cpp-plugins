@@ -1,2 +1,2 @@
 # cpp-plugins
-Simple cpp plugin interface and loader
+Experementing with building a cpp plugin system
